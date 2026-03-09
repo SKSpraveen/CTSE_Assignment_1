@@ -1,0 +1,53 @@
+version: "3.9"
+
+networks:
+  app-network:
+    driver: bridge
+
+services:
+  # ─── API Gateway ───────────────────────────────────────────────
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:80"
+    depends_on:
+      - user-service
+      - admin-service
+      - appointment-service
+      - service-provider-service
+    networks:
+      - app-network
+
+  # ─── User Service ──────────────────────────────────────────────
+  user-service:
+    build: ./user-service
+    env_file: ./user-service/.env
+    networks:
+      - app-network
+
+  # ─── Admin Service ─────────────────────────────────────────────
+  admin-service:
+    build: ./admin-service
+    env_file: ./admin-service/.env
+    depends_on:
+      - user-service
+      - service-provider-service
+    networks:
+      - app-network
+
+  # ─── Appointment Service ───────────────────────────────────────
+  appointment-service:
+    build: ./appointment-service
+    env_file: ./appointment-service/.env
+    depends_on:
+      - user-service
+      - service-provider-service
+    networks:
+      - app-network
+
+  # ─── Service Provider Service ──────────────────────────────────
+  service-provider-service:
+    build: ./service-provider-service
+    env_file: ./service-provider-service/.env
+    networks:
+      - app-network
