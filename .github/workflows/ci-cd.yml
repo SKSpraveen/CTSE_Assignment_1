@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_PREFIX: y4s2-projects/appointment-system
+  IMAGE_PREFIX: skspraveen/appointment-system
 
 # ── Global permissions for GITHUB_TOKEN ───────────────────────────
 permissions:
