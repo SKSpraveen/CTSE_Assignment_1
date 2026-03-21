@@ -1,0 +1,150 @@
+name: CI/CD Pipeline — Online Appointment System
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: y4s2-projects/appointment-system
+
+# ── Global permissions for GITHUB_TOKEN ───────────────────────────
+permissions:
+  contents: read
+  packages: write
+  security-events: write
+
+jobs:
+  # ──────────────────────────────────────────────────────────────
+  # 1. SAST — SonarCloud Security Scan
+  # ──────────────────────────────────────────────────────────────
+  sast-scan:
+    name: SAST (SonarCloud)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN:  ${{ secrets.SONAR_TOKEN }}
+        continue-on-error: true
+
+  # ──────────────────────────────────────────────────────────────
+  # 2. Dependency Vulnerability Scan (Snyk)
+  # ──────────────────────────────────────────────────────────────
+  snyk-scan:
+    name: Snyk Vulnerability Scan
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - user-service
+          - admin-service
+          - appointment-service
+          - service-provider-service
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies — ${{ matrix.service }}
+        run: npm install
+        working-directory: ./${{ matrix.service }}
+
+      - name: Run Snyk on ${{ matrix.service }}
+        run: npx snyk test --severity-threshold=high
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        working-directory: ./${{ matrix.service }}
+        continue-on-error: true   # don't block build on free tier
+
+  # ──────────────────────────────────────────────────────────────
+  # 3. Build & Push Docker Images to GHCR
+  # ──────────────────────────────────────────────────────────────
+  build-and-push:
+    name: Build & Push — ${{ matrix.service }}
+    runs-on: ubuntu-latest
+    needs: [sast-scan, snyk-scan]   # ← waits for both scans to finish
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - user-service
+          - admin-service
+          - appointment-service
+          - service-provider-service
+          - api-gateway
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push ${{ matrix.service }}
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ matrix.service }}
+          push: true
+          tags: |
+            ghcr.io/${{ env.IMAGE_PREFIX }}/${{ matrix.service }}:latest
+            ghcr.io/${{ env.IMAGE_PREFIX }}/${{ matrix.service }}:${{ github.sha }}
+
+  # ──────────────────────────────────────────────────────────────
+  # 4. Deploy to Azure Container Apps
+  # ──────────────────────────────────────────────────────────────
+  deploy:
+    name: Deploy — ${{ matrix.app }}
+    runs-on: ubuntu-latest
+    needs: [build-and-push]
+    if: github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: user-service
+            app:     user-service
+          - service: admin-service
+            app:     admin-service
+          - service: appointment-service
+            app:     appointment-service
+          - service: service-provider-service
+            app:     service-provider-service
+          - service: api-gateway
+            app:     api-gateway
+
+    steps:
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Verify Azure Login
+        run: |
+          az account show
+          az containerapp list --resource-group ${{ secrets.AZURE_RG }} --output table
+
+      - name: Deploy ${{ matrix.service }} to Azure Container Apps
+        run: |
+          az containerapp update \
+            --name ${{ matrix.app }} \
+            --resource-group ${{ secrets.AZURE_RG }} \
+            --image ghcr.io/${{ env.IMAGE_PREFIX }}/${{ matrix.service }}:${{ github.sha }}
