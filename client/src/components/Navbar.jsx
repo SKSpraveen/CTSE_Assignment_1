@@ -10,62 +10,72 @@ export default function Navbar() {
 
   const handleLogout = () => { logout(); nav("/login"); };
 
-  const dashPath = role === "admin" ? "/admin/dashboard"
+  const dashPath = role === "admin"    ? "/admin/dashboard"
                  : role === "provider" ? "/provider/dashboard"
                  : "/dashboard";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-white/8 bg-[#020817]/85 backdrop-blur-xl">
+      {/* Top accent line */}
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+
       <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 h-14 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-700 border border-blue-100">
-            <Calendar size={18} />
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2.5 group">
+          <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600/20 border border-blue-500/30 text-blue-400 group-hover:bg-blue-600/30 group-hover:border-blue-400/50 transition-all duration-200">
+            <Calendar size={16} />
           </span>
-          <span className="font-semibold text-slate-900">AppointEase</span>
+          <span className="font-semibold text-white tracking-tight">
+            Appoint<span className="text-blue-400">Ease</span>
+          </span>
         </Link>
 
-        <nav className="flex items-center gap-2">
+        {/* Nav */}
+        <nav className="flex items-center gap-1.5">
           {isLoggedIn ? (
             <>
               <Link to={dashPath}>
-                <Button variant="ghost" className="hidden sm:inline-flex">
-                  <LayoutDashboard size={16} /> Dashboard
+                <Button variant="ghost" size="sm" className="hidden sm:inline-flex text-slate-300 hover:text-white">
+                  <LayoutDashboard size={15} /> Dashboard
                 </Button>
               </Link>
+
               {role === "user" && (
                 <Link to="/profile">
-                  <Button variant="ghost" className="hidden sm:inline-flex">
-                    <IdCard size={16} /> Profile
+                  <Button variant="ghost" size="sm" className="hidden sm:inline-flex text-slate-300 hover:text-white">
+                    <IdCard size={15} /> Profile
                   </Button>
                 </Link>
               )}
 
-              <div className="hidden md:flex items-center gap-2 px-2">
-                <span className="text-sm text-slate-600 flex items-center gap-2">
-                  <User size={16} className="text-slate-400" />
-                  <span className="max-w-[220px] truncate">{user?.name || user?.email}</span>
+              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/4 border border-white/8 mx-1">
+                <div className="h-6 w-6 rounded-full bg-blue-600/30 border border-blue-500/30 flex items-center justify-center">
+                  <User size={12} className="text-blue-300" />
+                </div>
+                <span className="text-sm text-slate-300 max-w-[160px] truncate">
+                  {user?.name || user?.email}
                 </span>
-                <Badge variant="neutral" className="capitalize">{role}</Badge>
+                <Badge variant="default" className="capitalize text-[10px] px-1.5 py-0">{role}</Badge>
               </div>
 
-              <Button onClick={handleLogout} variant="outline" className="border-slate-200">
-                <LogOut size={16} /> Logout
+              <Button onClick={handleLogout} variant="outline" size="sm" className="text-slate-300">
+                <LogOut size={15} /> Logout
               </Button>
             </>
           ) : (
             <>
               <Link to="/login">
-                <Button variant="ghost" className="hidden sm:inline-flex">User</Button>
+                <Button variant="ghost" size="sm" className="hidden sm:inline-flex text-slate-400 hover:text-white">User</Button>
               </Link>
               <Link to="/admin/login">
-                <Button variant="ghost" className="hidden sm:inline-flex">Admin</Button>
+                <Button variant="ghost" size="sm" className="hidden sm:inline-flex text-slate-400 hover:text-white">Admin</Button>
               </Link>
               <Link to="/provider/login">
-                <Button variant="ghost" className="hidden sm:inline-flex">Provider</Button>
+                <Button variant="ghost" size="sm" className="hidden sm:inline-flex text-slate-400 hover:text-white">Provider</Button>
               </Link>
               <Link to="/login">
-                <Button>
-                  <LogIn size={16} /> Sign in
+                <Button size="sm">
+                  <LogIn size={15} /> Sign in
                 </Button>
               </Link>
             </>

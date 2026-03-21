@@ -15,10 +15,10 @@ import { Users, Briefcase, Calendar, CheckCircle, Trash2, ToggleLeft, ToggleRigh
 const TABS = ["Users", "Providers", "Appointments"];
 
 export default function AdminDashboard() {
-  const [tab,    setTab]    = useState("Users");
-  const [users,  setUsers]  = useState([]);
-  const [provs,  setProvs]  = useState([]);
-  const [appts,  setAppts]  = useState([]);
+  const [tab,     setTab]    = useState("Users");
+  const [users,   setUsers]  = useState([]);
+  const [provs,   setProvs]  = useState([]);
+  const [appts,   setAppts]  = useState([]);
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
@@ -33,7 +33,11 @@ export default function AdminDashboard() {
 
   const action = async (fn, ...args) => { await fn(...args); load(); };
 
-  const tabIcon = { Users: <Users size={16}/>, Providers: <Briefcase size={16}/>, Appointments: <Calendar size={16}/> };
+  const tabIcon = {
+    Users:        <Users size={15}/>,
+    Providers:    <Briefcase size={15}/>,
+    Appointments: <Calendar size={15}/>,
+  };
 
   const statusBadge = (s) => {
     if (s === "confirmed") return "success";
@@ -41,59 +45,55 @@ export default function AdminDashboard() {
     return "warning";
   };
 
+  const statCards = [
+    { label: "Total Users",        val: users.length, icon: Users,    color: "text-blue-400",    ring: "bg-blue-500/12 border-blue-500/25" },
+    { label: "Total Providers",    val: provs.length, icon: Briefcase,color: "text-slate-300",   ring: "bg-white/6 border-white/12" },
+    { label: "Total Appointments", val: appts.length, icon: Calendar, color: "text-emerald-400", ring: "bg-emerald-500/12 border-emerald-500/25" },
+  ];
+
+  const thClass = "text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-widest bg-white/3 border-b border-white/8";
+  const tdClass = "px-4 py-3.5";
+
   return (
     <Page>
       <PageContainer>
-        <div className="flex items-start justify-between gap-4 mb-6">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-4 mb-8 animate-fade-up">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Admin Dashboard</h1>
-            <p className="text-sm text-slate-600 mt-1">Manage users, providers and appointments.</p>
+            <p className="text-xs text-blue-400 font-mono uppercase tracking-widest mb-1">Control Panel</p>
+            <h1 className="text-2xl font-bold text-white tracking-tight">Admin Dashboard</h1>
+            <p className="text-sm text-slate-400 mt-1">Manage users, providers and appointments.</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          {[
-            {
-              label: "Total Users",
-              val: users.length,
-              icon: Users,
-              tone: "bg-blue-50 text-blue-700 border-blue-100",
-            },
-            {
-              label: "Total Providers",
-              val: provs.length,
-              icon: Briefcase,
-              tone: "bg-slate-50 text-slate-700 border-slate-200",
-            },
-            {
-              label: "Total Appointments",
-              val: appts.length,
-              icon: Calendar,
-              tone: "bg-emerald-50 text-emerald-700 border-emerald-100",
-            },
-          ].map((s) => (
-            <Card key={s.label}>
-              <CardHeader className="pb-3">
-                <CardDescription>{s.label}</CardDescription>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-3xl">{s.val}</CardTitle>
-                  <span className={`inline-flex h-9 w-9 items-center justify-center rounded-xl border ${s.tone}`}>
-                    <s.icon size={18} />
-                  </span>
-                </div>
-              </CardHeader>
-            </Card>
+        {/* Stat Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          {statCards.map((s, i) => (
+            <div
+              key={s.label}
+              className="rounded-2xl border border-white/8 bg-[#0d1f3c]/60 backdrop-blur-sm p-5 flex items-center justify-between group hover:border-blue-500/25 transition-all duration-300"
+              style={{ animationDelay: `${i * 0.06}s` }}
+            >
+              <div>
+                <p className="text-xs text-slate-500 uppercase tracking-widest mb-1">{s.label}</p>
+                <p className="text-3xl font-bold text-white font-mono">{s.val}</p>
+              </div>
+              <div className={`inline-flex h-11 w-11 items-center justify-center rounded-xl border ${s.ring} ${s.color}`}>
+                <s.icon size={20} />
+              </div>
+            </div>
           ))}
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-4">
+        {/* Tab Buttons */}
+        <div className="flex flex-wrap gap-2 mb-5">
           {TABS.map((t) => (
             <Button
               key={t}
               type="button"
               variant={tab === t ? "default" : "outline"}
+              size="sm"
               onClick={() => setTab(t)}
-              className={tab === t ? "" : "border-slate-200"}
             >
               {tabIcon[t]} {t}
             </Button>
@@ -103,61 +103,44 @@ export default function AdminDashboard() {
         {loading ? (
           <Spinner />
         ) : (
-          <Card className="overflow-hidden">
+          <Card className="overflow-hidden animate-fade-up">
+            {/* ── Users ───────────────────────────────────────── */}
             {tab === "Users" && (
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead className="bg-slate-50 text-slate-600">
+                    <thead>
                       <tr>
-                        {["Name", "Email", "Phone", "Verified", "Active", "Actions"].map((h) => (
-                          <th key={h} className="text-left px-4 py-3 font-medium">
-                            {h}
-                          </th>
+                        {["Name", "Email", "Phone", "Verified", "Active", "Actions"].map(h => (
+                          <th key={h} className={thClass}>{h}</th>
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y">
+                    <tbody className="divide-y divide-white/5">
                       {users.map((u) => (
-                        <tr key={u._id} className="hover:bg-slate-50">
-                          <td className="px-4 py-3 font-medium text-slate-900">{u.name}</td>
-                          <td className="px-4 py-3 text-slate-600">{u.email}</td>
-                          <td className="px-4 py-3 text-slate-600">{u.phone || "—"}</td>
-                          <td className="px-4 py-3">
-                            {u.isVerified ? (
-                              <Badge variant="success">
-                                <CheckCircle size={14} /> Verified
-                              </Badge>
-                            ) : (
-                              <Badge variant="neutral">No</Badge>
-                            )}
+                        <tr key={u._id} className="hover:bg-white/3 transition-colors">
+                          <td className={`${tdClass} font-medium text-white`}>{u.name}</td>
+                          <td className={`${tdClass} text-slate-400 font-mono text-xs`}>{u.email}</td>
+                          <td className={`${tdClass} text-slate-400`}>{u.phone || "—"}</td>
+                          <td className={tdClass}>
+                            {u.isVerified
+                              ? <Badge variant="success"><CheckCircle size={11} /> Verified</Badge>
+                              : <Badge variant="neutral">No</Badge>}
                           </td>
-                          <td className="px-4 py-3">
-                            {u.isActive ? (
-                              <Badge variant="success">Active</Badge>
-                            ) : (
-                              <Badge variant="destructive">Inactive</Badge>
-                            )}
+                          <td className={tdClass}>
+                            {u.isActive
+                              ? <Badge variant="success">Active</Badge>
+                              : <Badge variant="destructive">Inactive</Badge>}
                           </td>
-                          <td className="px-4 py-3">
+                          <td className={tdClass}>
                             <div className="flex flex-wrap gap-2">
                               {!u.isVerified && (
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="border-green-200 text-green-700 hover:bg-green-50"
-                                  onClick={() => action(verifyUser, u._id)}
-                                >
+                                <Button size="sm" variant="secondary" onClick={() => action(verifyUser, u._id)}>
                                   Verify
                                 </Button>
                               )}
                               {u.isActive && (
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="border-red-200 text-red-700 hover:bg-red-50"
-                                  onClick={() => action(deactivateUser, u._id)}
-                                >
+                                <Button size="sm" variant="destructive" onClick={() => action(deactivateUser, u._id)}>
                                   Deactivate
                                 </Button>
                               )}
@@ -171,62 +154,44 @@ export default function AdminDashboard() {
               </CardContent>
             )}
 
+            {/* ── Providers ──────────────────────────────────── */}
             {tab === "Providers" && (
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead className="bg-slate-50 text-slate-600">
+                    <thead>
                       <tr>
-                        {["Name", "Email", "Specialty", "Status", "Actions"].map((h) => (
-                          <th key={h} className="text-left px-4 py-3 font-medium">
-                            {h}
-                          </th>
+                        {["Name", "Email", "Specialty", "Status", "Actions"].map(h => (
+                          <th key={h} className={thClass}>{h}</th>
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y">
+                    <tbody className="divide-y divide-white/5">
                       {provs.map((p) => (
-                        <tr key={p._id} className="hover:bg-slate-50">
-                          <td className="px-4 py-3 font-medium text-slate-900">{p.name}</td>
-                          <td className="px-4 py-3 text-slate-600">{p.email}</td>
-                          <td className="px-4 py-3 text-slate-700">{p.specialty}</td>
-                          <td className="px-4 py-3">
-                            {p.isActive ? (
-                              <Badge variant="success">Active</Badge>
-                            ) : (
-                              <Badge variant="neutral">Inactive</Badge>
-                            )}
+                        <tr key={p._id} className="hover:bg-white/3 transition-colors">
+                          <td className={`${tdClass} font-medium text-white`}>{p.name}</td>
+                          <td className={`${tdClass} text-slate-400 font-mono text-xs`}>{p.email}</td>
+                          <td className={`${tdClass} text-slate-300`}>{p.specialty}</td>
+                          <td className={tdClass}>
+                            {p.isActive
+                              ? <Badge variant="success">Active</Badge>
+                              : <Badge variant="neutral">Inactive</Badge>}
                           </td>
-                          <td className="px-4 py-3">
+                          <td className={tdClass}>
                             <div className="flex flex-wrap gap-2">
                               {p.isActive ? (
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="border-amber-200 text-amber-800 hover:bg-amber-50"
-                                  onClick={() => action(deactivateProvider, p._id)}
-                                >
-                                  <ToggleLeft size={14} /> Deactivate
+                                <Button size="sm" variant="outline" className="text-amber-300 border-amber-500/25 hover:bg-amber-500/10"
+                                  onClick={() => action(deactivateProvider, p._id)}>
+                                  <ToggleLeft size={13} /> Deactivate
                                 </Button>
                               ) : (
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="border-green-200 text-green-700 hover:bg-green-50"
-                                  onClick={() => action(activateProvider, p._id)}
-                                >
-                                  <ToggleRight size={14} /> Activate
+                                <Button size="sm" variant="secondary" onClick={() => action(activateProvider, p._id)}>
+                                  <ToggleRight size={13} /> Activate
                                 </Button>
                               )}
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="border-red-200 text-red-700 hover:bg-red-50"
-                                onClick={() => {
-                                  if (confirm("Delete this provider?")) action(deleteProvider, p._id);
-                                }}
-                              >
-                                <Trash2 size={14} /> Delete
+                              <Button size="sm" variant="destructive"
+                                onClick={() => { if (confirm("Delete this provider?")) action(deleteProvider, p._id); }}>
+                                <Trash2 size={13} /> Delete
                               </Button>
                             </div>
                           </td>
@@ -238,32 +203,27 @@ export default function AdminDashboard() {
               </CardContent>
             )}
 
+            {/* ── Appointments ──────────────────────────────── */}
             {tab === "Appointments" && (
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead className="bg-slate-50 text-slate-600">
+                    <thead>
                       <tr>
-                        {["User", "Provider", "Date", "Time", "Status"].map((h) => (
-                          <th key={h} className="text-left px-4 py-3 font-medium">
-                            {h}
-                          </th>
+                        {["User", "Provider", "Date", "Time", "Status"].map(h => (
+                          <th key={h} className={thClass}>{h}</th>
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y">
+                    <tbody className="divide-y divide-white/5">
                       {appts.map((a) => (
-                        <tr key={a._id} className="hover:bg-slate-50">
-                          <td className="px-4 py-3 text-slate-900">{a.userName || a.userId}</td>
-                          <td className="px-4 py-3 text-slate-600">{a.providerId}</td>
-                          <td className="px-4 py-3 text-slate-700">{a.date}</td>
-                          <td className="px-4 py-3 text-slate-700">
-                            {a.startTime} – {a.endTime}
-                          </td>
-                          <td className="px-4 py-3">
-                            <Badge variant={statusBadge(a.status)} className="capitalize">
-                              {a.status}
-                            </Badge>
+                        <tr key={a._id} className="hover:bg-white/3 transition-colors">
+                          <td className={`${tdClass} text-white font-medium`}>{a.userName || a.userId}</td>
+                          <td className={`${tdClass} text-slate-400`}>{a.providerId}</td>
+                          <td className={`${tdClass} text-slate-300 font-mono text-xs`}>{a.date}</td>
+                          <td className={`${tdClass} text-slate-400 font-mono text-xs`}>{a.startTime} – {a.endTime}</td>
+                          <td className={tdClass}>
+                            <Badge variant={statusBadge(a.status)} className="capitalize">{a.status}</Badge>
                           </td>
                         </tr>
                       ))}
