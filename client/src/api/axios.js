@@ -39,7 +39,7 @@ export const getAllProviders      = ()     => api.get("/api/admin/providers");
 export const activateProvider    = (id)   => api.put(`/api/admin/providers/${id}/activate`);
 export const deactivateProvider  = (id)   => api.put(`/api/admin/providers/${id}/deactivate`);
 export const deleteProvider      = (id)   => api.delete(`/api/admin/providers/${id}`);
-export const getAllAppointments   = ()     => api.get("/api/admin/appointments");
+export const getAllAppointments   = ()     => api.get("/api/appointments/all");
 
 // ── Appointment Service ─────────────────────────────────────────
 export const getProviders        = ()     => api.get("/api/appointments/providers");

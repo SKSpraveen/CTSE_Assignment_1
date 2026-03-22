@@ -83,7 +83,7 @@ router.put("/notifications/:id/read", protect(["provider"]), async (req, res) =>
 
 // GET /api/providers/all  — internal / admin use
 router.get("/all", protect(["admin", "user", "provider"]), async (req, res) => {
-  const providers = await Provider.find({ isActive: true }).select("-password");
+  const providers = await Provider.find().select("-password");
   res.json(providers);
 });
 
