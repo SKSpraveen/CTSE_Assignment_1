@@ -4,6 +4,11 @@ import { useAuth } from "../../context/AuthContext";
 import { loginUser } from "../../api/axios";
 import { LogIn, Mail, Lock } from "lucide-react";
 import { Alert } from "../../components/Alert";
+import { Page, PageContainer } from "../../components/ui/page";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
 
 export default function UserLogin() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -24,39 +29,61 @@ export default function UserLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
-        <h1 className="text-2xl font-bold text-gray-800 mb-1">Welcome back</h1>
-        <p className="text-gray-500 text-sm mb-6">Sign in to your account</p>
-        <Alert type="error" msg={err} />
-        <form onSubmit={submit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <div className="relative">
-              <Mail size={16} className="absolute left-3 top-3 text-gray-400" />
-              <input type="email" required placeholder="you@email.com"
-                className="w-full border rounded-lg pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <div className="relative">
-              <Lock size={16} className="absolute left-3 top-3 text-gray-400" />
-              <input type="password" required placeholder="••••••••"
-                className="w-full border rounded-lg pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={form.password} onChange={e => setForm({...form, password: e.target.value})} />
-            </div>
-          </div>
-          <button type="submit" disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-medium flex items-center justify-center gap-2 disabled:opacity-60">
-            <LogIn size={16} /> {loading ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
-        <p className="text-sm text-center text-gray-500 mt-4">
-          No account? <Link to="/register" className="text-blue-600 hover:underline">Register</Link>
-        </p>
-      </div>
-    </div>
+    <Page>
+      <PageContainer>
+        <div className="flex items-center justify-center py-10">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="text-2xl">Welcome back</CardTitle>
+              <CardDescription>Sign in to your account</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Alert type="error" msg={err} />
+              <form onSubmit={submit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <div className="relative">
+                    <Mail size={16} className="absolute left-3 top-3 text-slate-400" />
+                    <Input
+                      id="email"
+                      type="email"
+                      required
+                      placeholder="you@email.com"
+                      className="pl-9"
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <div className="relative">
+                    <Lock size={16} className="absolute left-3 top-3 text-slate-400" />
+                    <Input
+                      id="password"
+                      type="password"
+                      required
+                      placeholder="••••••••"
+                      className="pl-9"
+                      value={form.password}
+                      onChange={(e) => setForm({ ...form, password: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <Button type="submit" disabled={loading} className="w-full">
+                  <LogIn size={16} /> {loading ? "Signing in..." : "Sign In"}
+                </Button>
+              </form>
+              <p className="text-sm text-center text-slate-600 mt-5">
+                No account?{" "}
+                <Link to="/register" className="text-blue-700 hover:underline">
+                  Register
+                </Link>
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </PageContainer>
+    </Page>
   );
 }

@@ -3,7 +3,12 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { getMyProfile, getMyAppointments, cancelAppointment } from "../../api/axios";
 import { Spinner } from "../../components/Spinner";
-import { CalendarPlus, CheckCircle, XCircle, Clock, Calendar } from "lucide-react";
+import { Page, PageContainer } from "../../components/ui/page";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
+import { Badge } from "../../components/ui/badge";
+import { Separator } from "../../components/ui/separator";
+import { CalendarPlus, CheckCircle, XCircle, Clock, Calendar, IdCard } from "lucide-react";
 
 export default function UserDashboard() {
   const { user } = useAuth();
@@ -31,58 +36,128 @@ export default function UserDashboard() {
     ? <XCircle size={14} className="text-red-500" />
     : <Clock size={14} className="text-yellow-500" />;
 
+  const statusBadge = (s) => {
+    if (s === "confirmed") return "success";
+    if (s === "cancelled") return "destructive";
+    return "warning";
+  };
+
   if (loading) return <Spinner />;
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl text-white p-6 mb-6 flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold">Hello, {profile?.name} 👋</h1>
-          <p className="text-blue-200 text-sm mt-1">{profile?.email}</p>
-          <span className={`inline-flex items-center gap-1 mt-2 text-xs px-2 py-1 rounded-full font-medium ${
-            profile?.isVerified ? "bg-green-500" : "bg-yellow-500"}`}>
-            {profile?.isVerified ? <><CheckCircle size={12}/> Verified</> : <><Clock size={12}/> Pending Verification</>}
-          </span>
-        </div>
-        <Link to="/book"
-          className="flex items-center gap-2 bg-white text-blue-700 font-semibold px-4 py-2.5 rounded-xl hover:bg-blue-50">
-          <CalendarPlus size={18} /> Book Appointment
-        </Link>
-      </div>
+    <Page>
+      <PageContainer>
+        <div className="flex flex-col gap-6">
+          <Card className="overflow-hidden">
+            <div className="bg-blue-700">
+              <div className="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="text-white">
+                  <h1 className="text-2xl font-bold">Welcome, {profile?.name}</h1>
+                  <p className="text-blue-100 text-sm mt-1">{profile?.email}</p>
+                  <div className="mt-3">
+                    {profile?.isVerified ? (
+                      <Badge variant="success">
+                        <CheckCircle size={14} /> Verified
+                      </Badge>
+                    ) : (
+                      <Badge variant="warning">
+                        <Clock size={14} /> Pending verification
+                      </Badge>
+                    )}
+                  </div>
+                </div>
 
-      {/* Appointments */}
-      <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-        <Calendar size={18} /> My Appointments
-      </h2>
-      {appts.length === 0 ? (
-        <div className="bg-white rounded-xl border p-8 text-center text-gray-400">
-          No appointments yet. <Link to="/book" className="text-blue-600 hover:underline">Book one now</Link>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {appts.map(a => (
-            <div key={a._id} className="bg-white rounded-xl border p-4 flex justify-between items-center">
-              <div>
-                <p className="font-medium text-gray-800">{a.date} · {a.startTime} – {a.endTime}</p>
-                <p className="text-sm text-gray-500 mt-0.5">Provider ID: {a.providerId}</p>
-                {a.notes && <p className="text-xs text-gray-400 mt-0.5">Note: {a.notes}</p>}
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="flex items-center gap-1 text-sm capitalize text-gray-600">
-                  {statusIcon(a.status)} {a.status}
-                </span>
-                {a.status !== "cancelled" && (
-                  <button onClick={() => cancel(a._id)}
-                    className="text-xs text-red-500 hover:text-red-700 border border-red-200 px-2 py-1 rounded-lg">
-                    Cancel
-                  </button>
-                )}
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Link to="/profile">
+                    <Button variant="secondary" className="w-full sm:w-auto">
+                      <IdCard size={16} /> View profile
+                    </Button>
+                  </Link>
+                  <Link to="/book">
+                    <Button className="w-full sm:w-auto">
+                      <CalendarPlus size={16} /> Book appointment
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
-          ))}
+            <div className="p-6 bg-white">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm text-slate-600">Signed in as</div>
+                  <div className="font-medium text-slate-900">{user?.email || profile?.email}</div>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                <Calendar size={18} className="text-blue-700" /> My Appointments
+              </h2>
+              <p className="text-sm text-slate-600 mt-1">Manage upcoming and past bookings.</p>
+            </div>
+          </div>
+
+          {appts.length === 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>No appointments yet</CardTitle>
+                <CardDescription>Book a time slot with a provider.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Link to="/book">
+                  <Button>
+                    <CalendarPlus size={16} /> Book appointment
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>Appointments</CardTitle>
+                <CardDescription>Your latest bookings</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {appts.map((a, idx) => (
+                  <div key={a._id} className="rounded-2xl border border-slate-200 p-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div>
+                        <div className="font-medium text-slate-900">
+                          {a.date} · {a.startTime} – {a.endTime}
+                        </div>
+                        <div className="text-sm text-slate-600 mt-1">Provider ID: {a.providerId}</div>
+                        {a.notes && (
+                          <div className="text-xs text-slate-500 mt-1">Note: {a.notes}</div>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <Badge variant={statusBadge(a.status)} className="capitalize">
+                          {statusIcon(a.status)} {a.status}
+                        </Badge>
+                        {a.status !== "cancelled" && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border-red-200 text-red-700 hover:bg-red-50"
+                            onClick={() => cancel(a._id)}
+                          >
+                            Cancel
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                    {idx !== appts.length - 1 && <Separator className="mt-4" />}
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
         </div>
-      )}
-    </div>
+      </PageContainer>
+    </Page>
   );
 }

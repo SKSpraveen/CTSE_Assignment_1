@@ -1,9 +1,14 @@
-import { useState } from "react";
+import { createElement, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { loginAdmin } from "../../api/axios";
 import { ShieldCheck, Mail, Lock } from "lucide-react";
 import { Alert } from "../../components/Alert";
+import { Page, PageContainer } from "../../components/ui/page";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
 
 export default function AdminLogin() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -24,35 +29,55 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
-        <div className="flex items-center gap-2 mb-1">
-          <ShieldCheck size={24} className="text-blue-700" />
-          <h1 className="text-2xl font-bold text-gray-800">Admin Portal</h1>
+    <Page>
+      <PageContainer>
+        <div className="flex items-center justify-center py-10">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="text-2xl flex items-center gap-2">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-700 border border-blue-100">
+                  <ShieldCheck size={18} />
+                </span>
+                Admin Portal
+              </CardTitle>
+              <CardDescription>Sign in with admin credentials</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Alert type="error" msg={err} />
+
+              <form onSubmit={submit} className="space-y-4">
+                {[
+                  { label: "Email", field: "email", type: "email", icon: Mail, ph: "admin@email.com" },
+                  { label: "Password", field: "password", type: "password", icon: Lock, ph: "••••••••" },
+                ].map(({ label, field, type, icon: Icon, ph }) => (
+                  <div key={field} className="space-y-2">
+                    <Label htmlFor={field}>{label}</Label>
+                    <div className="relative">
+                      {createElement(Icon, {
+                        size: 16,
+                        className: "absolute left-3 top-3 text-slate-400",
+                      })}
+                      <Input
+                        id={field}
+                        type={type}
+                        required
+                        placeholder={ph}
+                        className="pl-9"
+                        value={form[field]}
+                        onChange={(e) => setForm({ ...form, [field]: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                ))}
+
+                <Button type="submit" disabled={loading} className="w-full">
+                  {loading ? "Signing in..." : "Sign In as Admin"}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
         </div>
-        <p className="text-gray-500 text-sm mb-6">Sign in with admin credentials</p>
-        <Alert type="error" msg={err} />
-        <form onSubmit={submit} className="space-y-4">
-          {[
-            { label: "Email",    field: "email",    type: "email",    icon: Mail },
-            { label: "Password", field: "password", type: "password", icon: Lock },
-          ].map(({ label, field, type, icon: Icon }) => (
-            <div key={field}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-              <div className="relative">
-                <Icon size={16} className="absolute left-3 top-3 text-gray-400" />
-                <input type={type} required
-                  className="w-full border rounded-lg pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={form[field]} onChange={e => setForm({...form, [field]: e.target.value})} />
-              </div>
-            </div>
-          ))}
-          <button type="submit" disabled={loading}
-            className="w-full bg-gray-900 hover:bg-gray-800 text-white py-2.5 rounded-lg font-medium disabled:opacity-60">
-            {loading ? "Signing in..." : "Sign In as Admin"}
-          </button>
-        </form>
-      </div>
-    </div>
+      </PageContainer>
+    </Page>
   );
 }
