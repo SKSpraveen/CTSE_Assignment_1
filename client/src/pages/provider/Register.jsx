@@ -42,8 +42,8 @@ export default function ProviderRegister() {
                     <Briefcase size={20} />
                   </div>
                   <div>
-                    <CardTitle className="text-xl">Provider Registration</CardTitle>
-                    <CardDescription>Register as a service provider</CardDescription>
+                    <CardTitle className="text-xl">Doctor Registration</CardTitle>
+                    <CardDescription>Register as a service doctor</CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -72,7 +72,7 @@ export default function ProviderRegister() {
                         <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
                         Registering...
                       </span>
-                    ) : "Register as Provider"}
+                    ) : "Register as Doctor"}
                   </Button>
                 </form>
                 <p className="text-sm text-center text-slate-500 mt-6">

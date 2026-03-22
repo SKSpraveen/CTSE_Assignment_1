@@ -42,8 +42,8 @@ export function ProviderLogin() {
                     <Briefcase size={20} />
                   </div>
                   <div>
-                    <CardTitle className="text-xl">Provider Login</CardTitle>
-                    <CardDescription>Sign in to your provider account</CardDescription>
+                    <CardTitle className="text-xl">Doctor Login</CardTitle>
+                    <CardDescription>Sign in to your doctor account</CardDescription>
                   </div>
                 </div>
               </CardHeader>
