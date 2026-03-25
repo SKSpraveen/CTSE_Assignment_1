@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://api-gateway.salmonbeach-27f7baf6.eastus.azurecontainerapps.io";
+const BASE_URL = "https://api-gateway.delightfulmoss-83663602.eastus.azurecontainerapps.io";
 
 const api = axios.create({ baseURL: BASE_URL });
 
