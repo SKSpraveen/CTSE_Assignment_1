@@ -64,20 +64,15 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link to="/login">
-                <Button variant="ghost" size="sm" className="hidden sm:inline-flex text-slate-400 hover:text-white">User</Button>
-              </Link>
-              <Link to="/admin/login">
-                <Button variant="ghost" size="sm" className="hidden sm:inline-flex text-slate-400 hover:text-white">Admin</Button>
-              </Link>
-              <Link to="/provider/login">
-                <Button variant="ghost" size="sm" className="hidden sm:inline-flex text-slate-400 hover:text-white">Provider</Button>
-              </Link>
-              <Link to="/login">
-                <Button size="sm">
-                  <LogIn size={15} /> Sign in
-                </Button>
-              </Link>
+              <a href="/#user-section">
+                <Button size="sm" variant="outline" className="mx-1">User</Button>
+              </a>
+              <a href="/#doctor-section">
+                <Button size="sm" variant="outline" className="mx-1">Doctor</Button>
+              </a>
+              <a href="/#admin-section">
+                <Button size="sm" variant="outline" className="mx-1">Admin</Button>
+              </a>
             </>
           )}
         </nav>

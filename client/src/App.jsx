@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 
+
 import UserLogin        from "./pages/user/Login";
 import UserRegister     from "./pages/user/Register";
 import UserDashboard    from "./pages/user/Dashboard";
@@ -17,6 +18,7 @@ import ProviderDashboard from "./pages/provider/Dashboard";
 import ProtectedRoute   from "./components/ProtectedRoute";
 import Navbar           from "./components/Navbar";
 import Footer           from "./components/Footer";
+import LaunchPage       from "./pages/LaunchPage";
 
 export default function App() {
   return (
@@ -26,8 +28,8 @@ export default function App() {
           <Navbar />
           <main className="flex-1">
             <Routes>
-              {/* Public */}
-              <Route path="/"                   element={<Navigate to="/login" />} />
+              {/* Launch page as root */}
+              <Route path="/" element={<LaunchPage />} />
               <Route path="/login"              element={<UserLogin />} />
               <Route path="/register"           element={<UserRegister />} />
               <Route path="/admin/login"        element={<AdminLogin />} />
