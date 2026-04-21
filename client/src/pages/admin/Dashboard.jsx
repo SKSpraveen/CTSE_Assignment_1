@@ -57,7 +57,7 @@ export default function AdminDashboard() {
   return (
     <Page>
       <PageContainer>
-        {/* Header */}
+        {/* Headers */}
         <div className="flex items-start justify-between gap-4 mb-8 animate-fade-up">
           <div>
             <p className="text-xs text-blue-400 font-mono uppercase tracking-widest mb-1">Control Panel</p>
